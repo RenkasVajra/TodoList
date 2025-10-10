@@ -1,0 +1,12 @@
+<resources>
+    <string name="logo_text">Список дел</string>
+    <string name="buttonAdd">Добавить задачу</string>
+    <string name="tasktext">Опишите задачу</string>
+    <string name="deadline">Дедлайн</string>
+    <string name="importance">Важность</string>
+    <string-array name="importance_values">
+        <item>Неважная</item>
+        <item>Обычная</item>
+        <item>Важная</item>
+    </string-array>
+</resources>
