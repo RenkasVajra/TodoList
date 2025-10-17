@@ -7,11 +7,12 @@ import android.widget.Spinner
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import ch.qos.logback.classic.LoggerContext
 import java.util.UUID
-
+import org.slf4j.LoggerFactory
 
 class MainActivity : AppCompatActivity() {
-
+    private val logger = LoggerFactory.getLogger(MainActivity::class.java)
     private lateinit var prioritySpinner: Spinner
     private lateinit var taskInput: EditText
     private lateinit var addButton: Button
@@ -23,6 +24,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val context = LoggerFactory.getILoggerFactory() as LoggerContext
+        context.reset()
+        logger.info("MainActivity: onCreate()")
+
         setContentView(R.layout.activity_main)
 
         // recyclerView = findViewById(R.id.recyclerView)
