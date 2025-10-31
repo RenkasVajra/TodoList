@@ -5,11 +5,13 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Spinner
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ch.qos.logback.classic.LoggerContext
 import java.util.UUID
 import org.slf4j.LoggerFactory
+
 
 class MainActivity : AppCompatActivity() {
     private val logger = LoggerFactory.getLogger(MainActivity::class.java)
@@ -47,9 +49,7 @@ class MainActivity : AppCompatActivity() {
         addButton = findViewById(R.id.buttonAdd)
 
     }
-    // это на страницу создания задачи
     // taskInput = findViewById(R.id.adddescription)
 
 
 }
-
