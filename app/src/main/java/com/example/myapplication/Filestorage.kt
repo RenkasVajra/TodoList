@@ -1,74 +1,64 @@
 package com.example.myapplication
 
 import android.content.Context
-import android.content.SharedPreferences
-import android.graphics.Color
 import android.os.Build
 import androidx.annotation.RequiresApi
+import org.slf4j.LoggerFactory
+import java.io.*
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
-import java.util.*
-import java.util.UUID
-import androidx.core.content.edit
-import org.slf4j.LoggerFactory
-
 
 @RequiresApi(Build.VERSION_CODES.O)
 class FileStorage(private val context: Context) {
+
     private val logger = LoggerFactory.getLogger(FileStorage::class.java)
-    init { logger.info("FileStorage: Initializing FileStorage") }
-    private val sharedPreferences: SharedPreferences =
-        context.getSharedPreferences("TodoPrefs", Context.MODE_PRIVATE)
-    private val _items = mutableListOf<TodoItem>()
-    val items: List<TodoItem> = _items.toList()
-    @RequiresApi(Build.VERSION_CODES.O)
-    private val formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
-
-    init { loadTasksFromPreferences() }
+    private val items = mutableListOf<TodoItem>()
 
 
-    fun removeOverdueTasks() {
-        val now = LocalDateTime.now()
-        _items.removeIf { item ->
-            item.deadline?.let { deadlineString ->
-                try {
-                    val deadline = LocalDateTime.parse(deadlineString, formatter)
-                    deadline.isBefore(now)
-                } catch (e: DateTimeParseException) { false }
-            } ?: false
-        }
-        saveTasksToPreferences()
+    init {
+        loadTasksFromFile()
     }
 
-    private fun saveTasksToPreferences() {
-        sharedPreferences.edit {
-            val jsonArray = _items.map { it.toJson() }.toString()
-            putString("todoItems", jsonArray)
-        }
-    }
 
-    private fun loadTasksFromPreferences() {
-        val jsonString = sharedPreferences.getString("todoItems", "[]") ?: "[]"
-        try {
-            val jsonArray = org.json.JSONArray(jsonString)
-            for (i in 0 until jsonArray.length()) {
-                val jsonObject = jsonArray.getJSONObject(i)
-                jsonObject.toTodoItem()?.let { _items.add(it) }
-            }
-        } catch (e: Exception) {  e.printStackTrace() }
-        removeOverdueTasks()
-    }
-
-    fun addTodoItem(item: TodoItem ) {
-        _items.add(item)
-        saveTasksToPreferences()
+    fun addTodoItem(item: TodoItem) {
+        items.add(item)
+        //saveTasksToFile()
         logger.debug("Задача {} добавлена", item.uid)
     }
 
+
     fun removeTodoItem(uid: String) {
-        _items.removeAll { it.uid == uid }
-        saveTasksToPreferences()
+        items.removeIf { it.uid == uid }
+        //saveTasksToFile()
         logger.debug("Задача {} удалена", uid)
+    }
+
+
+    private fun saveTasksToFile() {
+        try {
+            FileOutputStream(File(context.filesDir, "todos.txt")).use {
+                ObjectOutputStream(it).use { it.writeObject(items) }
+            }
+        } catch (e: Exception) {
+            logger.error("Ошибка при сохранении задач в файл", e)
+        }
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun loadTasksFromFile() {
+        val file = File(context.filesDir, "todos.txt")
+
+        if (file.exists()) {
+            try {
+                ObjectInputStream(FileInputStream(file)).use {
+                    val loadedList = it.readObject() as? MutableList<TodoItem>
+                    items.clear()
+                    items.addAll(loadedList ?: emptyList())
+                }
+            } catch (e: Exception) {
+                logger.error("Произошла ошибка при загрузке задач из файла", e)
+            }
+        }
     }
 }
