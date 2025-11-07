@@ -5,6 +5,8 @@ import org.apache.tools.ant.util.JavaEnvUtils.VERSION_11
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.compose)
+
 }
 
 android {
@@ -34,12 +36,15 @@ android {
         compose = true
     }
 
-    kotlin{
-        compilerOptions{
-            jvmTarget = JvmTarget.JVM_11
-        }
-
+    kotlinOptions {
+        jvmTarget = "11"
     }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
+
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.15"
     }
@@ -52,6 +57,10 @@ android {
 }
 
 dependencies {
+    implementation("androidx.navigation:navigation-compose:2.9.6")
+    implementation("androidx.compose.material3:material3-window-size-class:1.4.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.4")
+    implementation("androidx.compose.material3:material3-icons-extended:1.1.1")
     implementation(libs.androidx.recyclerview)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
@@ -61,8 +70,10 @@ dependencies {
     implementation(libs.json)
     implementation(libs.androidx.runtime)
     implementation(libs.androidx.runtime.saveable)
-    implementation(libs.androidx.datastore.core.jvm)
+    //implementation(libs.androidx.datastore.core.jvm)
     implementation(libs.firebase.dataconnect)
+    implementation(libs.androidx.navigation.runtime.ktx)
+    implementation(libs.androidx.foundation)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -75,5 +86,4 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation("androidx.compose.material3:material3:1.4.0")
     implementation(platform("androidx.compose:compose-bom:2025.10.01"))
-    implementation("androidx.compose.ui:ui-tooling-preview")
 }

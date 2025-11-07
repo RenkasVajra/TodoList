@@ -17,7 +17,7 @@ class TodoAdapter(private val items: List<TodoItem>) : RecyclerView.Adapter<Todo
         val view = LayoutInflater.from(parent.context).inflate(R.layout.todo_item_layout, parent, false)
         return TodoViewHolder(view)
     }
-
+    //
     override fun onBindViewHolder(
         holder: TodoViewHolder,
         position: Int
@@ -25,7 +25,7 @@ class TodoAdapter(private val items: List<TodoItem>) : RecyclerView.Adapter<Todo
         TODO("Not yet implemented")
     }
 
-
+    //
     override fun getItemCount(): Int {
         TODO("Not yet implemented")
     }
