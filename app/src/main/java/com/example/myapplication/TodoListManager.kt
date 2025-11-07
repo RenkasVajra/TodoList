@@ -33,6 +33,7 @@ class TodoListManager {
             } ?: false
         }
 
+<<<<<<< HEAD
         @RequiresApi(Build.VERSION_CODES.O)
         fun startAutoCleanup() {
             Timer().schedule(delay = 0, period = 60_000) {
@@ -41,3 +42,13 @@ class TodoListManager {
         }
     }
 }
+=======
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun startAutoCleanup() {
+        Timer().schedule(delay = 0, period = 60_000) {
+            checkForExpiredItems()
+        }
+    }
+
+}
+>>>>>>> e641694f437f91ab5b478bc8f5f84eee7316c40b

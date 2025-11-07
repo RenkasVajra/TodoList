@@ -1,6 +1,7 @@
 package com.example.myapplication
 
 import android.os.Bundle
+<<<<<<< HEAD
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -19,12 +20,25 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.NavController
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+=======
+import android.widget.Button
+import android.widget.EditText
+import android.widget.Spinner
+import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+>>>>>>> e641694f437f91ab5b478bc8f5f84eee7316c40b
 import ch.qos.logback.classic.LoggerContext
 import org.slf4j.LoggerFactory
 import java.util.UUID
 
 
+<<<<<<< HEAD
 class MainActivity : ComponentActivity() {
+=======
+class MainActivity : AppCompatActivity() {
+>>>>>>> e641694f437f91ab5b478bc8f5f84eee7316c40b
     private val logger = LoggerFactory.getLogger(MainActivity::class.java)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -93,5 +107,12 @@ fun PreviewMainContent() {
     MyApplicationTheme {
         MainContent()
     }
+<<<<<<< HEAD
 }
 
+=======
+    // taskInput = findViewById(R.id.adddescription)
+
+
+}
+>>>>>>> e641694f437f91ab5b478bc8f5f84eee7316c40b

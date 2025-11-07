@@ -34,6 +34,7 @@ android {
     }
     buildFeatures {
         compose = true
+<<<<<<< HEAD
     }
 
     kotlinOptions {
@@ -48,6 +49,19 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.15"
     }
+=======
+    }
+
+    kotlin{
+        compilerOptions{
+            jvmTarget = JvmTarget.JVM_11
+        }
+
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.15"
+    }
+>>>>>>> e641694f437f91ab5b478bc8f5f84eee7316c40b
 
     dependenciesInfo {
         includeInApk = true
@@ -57,10 +71,13 @@ android {
 }
 
 dependencies {
+<<<<<<< HEAD
     implementation("androidx.navigation:navigation-compose:2.9.6")
     implementation("androidx.compose.material3:material3-window-size-class:1.4.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.4")
     implementation("androidx.compose.material3:material3-icons-extended:1.1.1")
+=======
+>>>>>>> e641694f437f91ab5b478bc8f5f84eee7316c40b
     implementation(libs.androidx.recyclerview)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
@@ -70,10 +87,15 @@ dependencies {
     implementation(libs.json)
     implementation(libs.androidx.runtime)
     implementation(libs.androidx.runtime.saveable)
+<<<<<<< HEAD
     //implementation(libs.androidx.datastore.core.jvm)
     implementation(libs.firebase.dataconnect)
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.foundation)
+=======
+    implementation(libs.androidx.datastore.core.jvm)
+    implementation(libs.firebase.dataconnect)
+>>>>>>> e641694f437f91ab5b478bc8f5f84eee7316c40b
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -86,4 +108,9 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation("androidx.compose.material3:material3:1.4.0")
     implementation(platform("androidx.compose:compose-bom:2025.10.01"))
+<<<<<<< HEAD
 }
+=======
+    implementation("androidx.compose.ui:ui-tooling-preview")
+}
+>>>>>>> e641694f437f91ab5b478bc8f5f84eee7316c40b
