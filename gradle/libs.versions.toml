@@ -15,11 +15,8 @@ runtime = "1.9.4"
 runtimeSaveable = "1.9.4"
 datastoreCoreJvm = "1.1.7"
 firebaseDataconnect = "17.1.0"
-<<<<<<< HEAD
 navigationRuntimeKtx = "2.9.6"
 foundation = "1.9.4"
-=======
->>>>>>> e641694f437f91ab5b478bc8f5f84eee7316c40b
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity" }
@@ -37,11 +34,8 @@ androidx-runtime = { group = "androidx.compose.runtime", name = "runtime", versi
 androidx-runtime-saveable = { group = "androidx.compose.runtime", name = "runtime-saveable", version.ref = "runtimeSaveable" }
 androidx-datastore-core-jvm = { group = "androidx.datastore", name = "datastore-core-jvm", version.ref = "datastoreCoreJvm" }
 firebase-dataconnect = { group = "com.google.firebase", name = "firebase-dataconnect", version.ref = "firebaseDataconnect" }
-<<<<<<< HEAD
 androidx-navigation-runtime-ktx = { group = "androidx.navigation", name = "navigation-runtime-ktx", version.ref = "navigationRuntimeKtx" }
 androidx-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundation" }
-=======
->>>>>>> e641694f437f91ab5b478bc8f5f84eee7316c40b
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

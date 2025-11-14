@@ -2,12 +2,10 @@ package com.example.myapplication
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import com.google.firebase.dataconnect.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.concurrent.schedule
-
 
 class TodoListManager {
 
@@ -28,27 +26,21 @@ class TodoListManager {
 
         todoItems.removeIf { item ->
             item.deadline?.let { deadlineStr ->
-                val deadline = LocalDateTime.parse(deadlineStr, formatter)
-                deadline.isBefore(now)
+                try {
+                    val deadline = LocalDateTime.parse(deadlineStr, formatter)
+                    deadline.isBefore(now)
+                } catch (e: Exception) {
+                    false
+                }
             } ?: false
         }
+    }
 
-<<<<<<< HEAD
-        @RequiresApi(Build.VERSION_CODES.O)
-        fun startAutoCleanup() {
-            Timer().schedule(delay = 0, period = 60_000) {
+    fun startAutoCleanup() {
+        Timer().schedule(delay = 0, period = 60_000) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 checkForExpiredItems()
             }
         }
     }
 }
-=======
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun startAutoCleanup() {
-        Timer().schedule(delay = 0, period = 60_000) {
-            checkForExpiredItems()
-        }
-    }
-
-}
->>>>>>> e641694f437f91ab5b478bc8f5f84eee7316c40b
