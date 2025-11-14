@@ -5,9 +5,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import org.slf4j.LoggerFactory
 import java.io.*
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeParseException
+
 
 @RequiresApi(Build.VERSION_CODES.O)
 class FileStorage(private val context: Context) {
@@ -19,7 +17,21 @@ class FileStorage(private val context: Context) {
     init {
         loadTasksFromFile()
     }
-
+    fun exportTasksToFile(todos: List<TodoItem>): String? {
+        val filename = "todo_list.txt"
+        val file = File(context.filesDir, filename)
+        return try {
+            BufferedWriter(FileWriter(file)).use { writer ->
+                for (todo in todos) {
+                    writer.write("${todo.uid},${todo.text},${todo.importance},${todo.deadline}\n")
+                }
+            }
+            file.absolutePath
+        } catch (e: IOException) {
+            logger.error("Ошибка при экспорте задач", e)
+            null
+        }
+    }
 
     fun addTodoItem(item: TodoItem) {
         items.add(item)

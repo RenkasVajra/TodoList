@@ -24,7 +24,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color as ComposeColor
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -32,6 +31,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import android.graphics.Color
+import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import ch.qos.logback.classic.LoggerContext
 import org.slf4j.LoggerFactory
 
@@ -41,6 +43,7 @@ import org.slf4j.LoggerFactory
 class MainActivity : ComponentActivity() {
     private val logger = LoggerFactory.getLogger(MainActivity::class.java)
     private val todoListManager = TodoListManager()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         todoListManager.startAutoCleanup()
@@ -58,9 +61,10 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MainContent() {
+
     val navController = rememberNavController()
     val todos = remember { mutableStateListOf<TodoItem>() }
-    
+
     NavHost(
         navController = navController,
         startDestination = "task_list"
@@ -122,18 +126,48 @@ fun TaskListScreen(
     onTaskClick: (TodoItem) -> Unit,
     onAddTaskClick: () -> Unit,
     onDeleteTask: (TodoItem) -> Unit,
-    onSaveTask: (TodoItem) -> Unit
-) {
+    onSaveTask: (TodoItem) -> Unit,
+
+
+)
+{
+    val context = LocalContext.current
+    val fileStorage = remember { FileStorage(context) }
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = onAddTaskClick,
-                modifier = Modifier.padding(16.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Добавить задачу"
-                )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceAround
+            )
+
+            {
+                Button(
+                    onClick = {
+                        if (todos.isNotEmpty()) {
+                            val path = fileStorage.exportTasksToFile(todos)
+                            if (path != null) {
+                                Toast.makeText(context, "Файл сохранён: $path", Toast.LENGTH_LONG).show()
+                            } else {
+                                Toast.makeText(context, "Ошибка при сохранении файла", Toast.LENGTH_LONG).show()
+                            }
+                        }
+                    },
+                    modifier = Modifier.padding(16.dp),
+                    enabled = todos.isNotEmpty()
+                ) {
+                    Text("Скачать список")
+                }
+
+                FloatingActionButton(
+                    onClick = onAddTaskClick,
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Добавить задачу"
+                    )
+                }
+
             }
         }
     ) { paddingValues ->
@@ -239,7 +273,6 @@ fun SwipeableTaskItem(
                         contentDescription = "Удалить",
                         tint = MaterialTheme.colorScheme.onError
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = "Delete",
                         color = MaterialTheme.colorScheme.onError,
@@ -307,7 +340,7 @@ fun TaskItemRow(
         }
     }
 }
-/*
+
 @Preview(
     showBackground = true,
     widthDp = 411,
@@ -356,6 +389,62 @@ fun PreviewTaskListScreen() {
                     text = "Прочитать книгу",
                     importance = Importance.Обычная,
                     color = null,
+                    deadline = "11-11-2027",
+                    isDone = false
+                ),
+                TodoItem(
+                    uid = "6",
+                    text = "Прочитать книгу2",
+                    importance = Importance.Обычная,
+                    color = null,
+                    deadline = "31-12-2024",
+                    isDone = false
+                ),
+                TodoItem(
+                    uid = "7",
+                    text = "Прочитать книгу3",
+                    importance = Importance.Обычная,
+                    color = null,
+                    deadline = "31-12-2024",
+                    isDone = false
+                ),
+                TodoItem(
+                    uid = "8",
+                    text = "Прочитать книгу4",
+                    importance = Importance.Обычная,
+                    color = null,
+                    deadline = "31-12-2024",
+                    isDone = false
+                ),
+                TodoItem(
+                    uid = "9",
+                    text = "Прочитать книгу5",
+                    importance = Importance.Обычная,
+                    color = null,
+                    deadline = "31-12-2024",
+                    isDone = false
+                ),
+                TodoItem(
+                    uid = "10",
+                    text = "Прочитать книгу6",
+                    importance = Importance.Обычная,
+                    color = null,
+                    deadline = "31-12-2025",
+                    isDone = false
+                ),
+                TodoItem(
+                    uid = "11",
+                    text = "Прочитать книгу7",
+                    importance = Importance.Обычная,
+                    color = null,
+                    deadline = "31-12-2024",
+                    isDone = false
+                ),
+                TodoItem(
+                    uid = "12",
+                    text = "Прочитать книгу8",
+                    importance = Importance.Обычная,
+                    color = null,
                     deadline = "31-12-2024",
                     isDone = false
                 )
@@ -371,4 +460,3 @@ fun PreviewTaskListScreen() {
         )
     }
 }
-*/

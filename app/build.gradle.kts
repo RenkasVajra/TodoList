@@ -75,6 +75,7 @@ dependencies {
     implementation(libs.firebase.dataconnect)
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.foundation)
+    implementation(libs.androidx.ui.tooling.preview)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -87,4 +88,5 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation("androidx.compose.material3:material3:1.4.0")
     implementation(platform("androidx.compose:compose-bom:2025.10.01"))
+    debugImplementation(libs.androidx.ui.tooling)
 }

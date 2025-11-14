@@ -21,8 +21,13 @@ import java.util.UUID
 
 @Composable
 fun EditTaskScreen(todoItem: TodoItem?, navController: NavHostController, saveChanges: (TodoItem) -> Unit) {
-    var textState by rememberSaveable(key = todoItem?.uid) { mutableStateOf(todoItem?.text ?: "") }
-    var deadlineState by rememberSaveable(key = todoItem?.uid) { mutableStateOf(todoItem?.deadline ?: "") }
+
+    var textState by rememberSaveable(key = todoItem?.uid) {
+        mutableStateOf(todoItem?.text ?: "")
+    }
+    var deadlineState by rememberSaveable(key = todoItem?.uid) {
+        mutableStateOf(todoItem?.deadline ?: "")
+    }
     val (selectedColor, setSelectedColor) = rememberSaveable(key = todoItem?.uid) {
         mutableStateOf(todoItem?.color ?: Color.RED)
     }
@@ -61,7 +66,7 @@ fun EditTaskScreen(todoItem: TodoItem?, navController: NavHostController, saveCh
             }
         }, enabled = textState.isNotBlank() && deadlineState.isNotBlank())
         {
-            Text("Сохранить изменения")
+            Text("Сохранить")
         }
     }
 }
