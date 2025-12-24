@@ -22,20 +22,24 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color as ComposeColor
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
 import android.graphics.Color
 import android.widget.Toast
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import ch.qos.logback.classic.LoggerContext
 import org.slf4j.LoggerFactory
+import kotlinx.coroutines.launch
 
 
 
@@ -46,24 +50,32 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        todoListManager.startAutoCleanup()
-        val context = LoggerFactory.getILoggerFactory() as LoggerContext
-        context.reset()
-        logger.info("MainActivity: onCreate()")
+
+        try {
+            todoListManager.startAutoCleanup()
+            val context = LoggerFactory.getILoggerFactory() as LoggerContext
+            context.reset()
+            logger.info("MainActivity: onCreate()")
 
         setContent {
             MyApplicationTheme {
                 MainContent()
             }
         }
+        } catch (e: Exception) {
+            logger.error("Ошибка при инициализации MainActivity", e)
+            finish()
+        }
     }
 }
 
 @Composable
 fun MainContent() {
+    val context = LocalContext.current
+    val viewModel = remember { TodoViewModel.create(context) }
 
     val navController = rememberNavController()
-    val todos = remember { mutableStateListOf<TodoItem>() }
+    val uiState by viewModel.uiState.collectAsState()
 
     NavHost(
         navController = navController,
@@ -71,7 +83,7 @@ fun MainContent() {
     ) {
         composable("task_list") {
             TaskListScreen(
-                todos = todos,
+                uiState = uiState,
                 onTaskClick = { task ->
                     navController.navigate("edit_task/${task.uid}")
                 },
@@ -79,15 +91,13 @@ fun MainContent() {
                     navController.navigate("edit_task/new")
                 },
                 onDeleteTask = { task ->
-                    todos.remove(task)
+                    viewModel.deleteTodo(task.uid)
                 },
                 onSaveTask = { task ->
-                    val existingIndex = todos.indexOfFirst { it.uid == task.uid }
-                    if (existingIndex >= 0) {
-                        todos[existingIndex] = task
-                    } else {
-                        todos.add(task)
-                    }
+                    viewModel.saveTodo(task)
+                },
+                onSyncClick = {
+                    viewModel.syncWithBackend()
                 }
             )
         }
@@ -100,19 +110,14 @@ fun MainContent() {
             val task = if (taskId == "new") {
                 null
             } else {
-                todos.find { it.uid == taskId }
+                uiState.todos.find { it.uid == taskId }
             }
-            
+
             EditTaskScreen(
                 todoItem = task,
                 navController = navController,
                 saveChanges = { updatedTask ->
-                    val existingIndex = todos.indexOfFirst { it.uid == updatedTask.uid }
-                    if (existingIndex >= 0) {
-                        todos[existingIndex] = updatedTask
-                    } else {
-                        todos.add(updatedTask)
-                    }
+                    viewModel.saveTodo(updatedTask)
                 }
             )
         }
@@ -122,38 +127,50 @@ fun MainContent() {
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun TaskListScreen(
-    todos: MutableList<TodoItem>,
+    uiState: TodoUiState,
     onTaskClick: (TodoItem) -> Unit,
     onAddTaskClick: () -> Unit,
     onDeleteTask: (TodoItem) -> Unit,
     onSaveTask: (TodoItem) -> Unit,
-
-
+    onSyncClick: () -> Unit
 )
 {
     val context = LocalContext.current
-    val fileStorage = remember { FileStorage(context) }
+    val scope = rememberCoroutineScope()
+
+    uiState.error?.let { error ->
+        LaunchedEffect(error) {
+            Toast.makeText(context, error, Toast.LENGTH_LONG).show()
+        }
+    }
+
     Scaffold(
         floatingActionButton = {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceAround
-            )
-
-            {
+            ) {
                 Button(
                     onClick = {
-                        if (todos.isNotEmpty()) {
-                            val path = fileStorage.exportTasksToFile(todos)
-                            if (path != null) {
-                                Toast.makeText(context, "Файл сохранён: $path", Toast.LENGTH_LONG).show()
-                            } else {
-                                Toast.makeText(context, "Ошибка при сохранении файла", Toast.LENGTH_LONG).show()
+                        if (uiState.todos.isNotEmpty()) {
+                            scope.launch {
+                                try {
+                                    val filename = "todo_list_export.txt"
+                                    val file = java.io.File(context.filesDir, filename)
+                                    file.bufferedWriter().use { writer ->
+                                        uiState.todos.forEach { todo ->
+                                            writer.write("${todo.uid},${todo.text},${todo.importance},${todo.deadline ?: "нет дедлайна"}\n")
+                                        }
+                                    }
+                                    Toast.makeText(context, "Файл сохранён: ${file.absolutePath}", Toast.LENGTH_LONG).show()
+                                } catch (e: Exception) {
+                                    Toast.makeText(context, "Ошибка при сохранении файла: ${e.message}", Toast.LENGTH_LONG).show()
+                                }
                             }
                         }
                     },
                     modifier = Modifier.padding(16.dp),
-                    enabled = todos.isNotEmpty()
+                    enabled = uiState.todos.isNotEmpty()
                 ) {
                     Text("Скачать список")
                 }
@@ -167,7 +184,6 @@ fun TaskListScreen(
                         contentDescription = "Добавить задачу"
                     )
                 }
-
             }
         }
     ) { paddingValues ->
@@ -176,6 +192,10 @@ fun TaskListScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
+            if (uiState.isLoading) {
+                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+            }
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -198,9 +218,34 @@ fun TaskListScreen(
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.weight(1f)
                 )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = when {
+                            !uiState.isApiConfigured -> Icons.Default.Delete
+                            uiState.isOnline -> Icons.Default.Add
+                            else -> Icons.Default.Delete
+                        },
+                        contentDescription = when {
+                            !uiState.isApiConfigured -> "API не настроен"
+                            uiState.isOnline -> "Онлайн"
+                            else -> "Оффлайн"
+                        },
+                        tint = when {
+                            !uiState.isApiConfigured -> androidx.compose.ui.graphics.Color.Gray
+                            uiState.isOnline -> androidx.compose.ui.graphics.Color.Green
+                            else -> androidx.compose.ui.graphics.Color.Red
+                        }
+                    )
+                    IconButton(onClick = onSyncClick) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = "Перезагрузить данные"
+                        )
+                    }
+                }
             }
 
-            if (todos.isEmpty()) {
+            if (uiState.todos.isEmpty() && !uiState.isLoading) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -217,7 +262,7 @@ fun TaskListScreen(
                     modifier = Modifier.fillMaxSize()
                 ) {
                     items(
-                        items = todos,
+                        items = uiState.todos,
                         key = { it.uid }
                     ) { task ->
                         SwipeableTaskItem(
@@ -452,11 +497,12 @@ fun PreviewTaskListScreen() {
         }
 
         TaskListScreen(
-            todos = testTodos,
+            uiState = TodoUiState(todos = testTodos),
             onTaskClick = { },
             onAddTaskClick = { },
             onDeleteTask = { },
-            onSaveTask = { }
+            onSaveTask = { },
+            onSyncClick = { }
         )
     }
 }
