@@ -39,9 +39,9 @@ class RoomCache(context: Context) {
         try {
             val entity = todoItem.toTodoEntity()
             todoDao.insertTodo(entity)
-            logger.debug("Р—Р°РґР°С‡Р° {} СЃРѕС…СЂР°РЅРµРЅР° РІ Room РєСЌС€", todoItem.uid)
+            logger.debug("Задача {} сохранена в Room кэше ", todoItem.uid)
         } catch (e: Exception) {
-            logger.error("РћС€РёР±РєР° РїСЂРё СЃРѕС…СЂР°РЅРµРЅРёРё Р·Р°РґР°С‡Рё  РІ Room", e)
+            logger.error("Ошибка при сохранении задачи  в Room кэш\n", e)
             throw e
         }
     }
@@ -51,9 +51,9 @@ class RoomCache(context: Context) {
         try {
             val entities = todoItems.map { it.toTodoEntity() }
             todoDao.insertTodos(entities)
-            logger.debug("РЎРѕС…СЂР°РЅРµРЅРѕ {} Р·Р°РґР°С‡ РІ Room РєСЌС€", todoItems.size)
+            logger.debug("Сохранено {} задач в Room кэш\n", todoItems.size)
         } catch (e: Exception) {
-            logger.error("РћС€РёР±РєР° РїСЂРё СЃРѕС…СЂР°РЅРµРЅРёРё СЃРїРёСЃРєР° Р·Р°РґР°С‡ РІ Room", e)
+            logger.error("Ошибка при сохранении списка задач в Room\n", e)
             throw e
         }
     }
@@ -63,9 +63,9 @@ class RoomCache(context: Context) {
         try {
             val entity = todoItem.toTodoEntity()
             todoDao.updateTodo(entity)
-            logger.debug("Р—Р°РґР°С‡Р° {} РѕР±РЅРѕРІР»РµРЅР° РІ Room РєСЌС€", todoItem.uid)
+            logger.debug("Задача {} обновлена в Room кэше \n", todoItem.uid)
         } catch (e: Exception) {
-            logger.error("РћС€РёР±РєР° РїСЂРё РѕР±РЅРѕРІР»РµРЅРёРё Р·Р°РґР°С‡Рё  РІ Room", e)
+            logger.error("Ошибка при обновлении задачи  в Room кэше\n", e)
             throw e
         }
     }
@@ -74,9 +74,9 @@ class RoomCache(context: Context) {
     suspend fun updateTodoDoneStatus(uid: String, isDone: Boolean) {
         try {
             todoDao.updateTodoDoneStatus(uid, isDone)
-            logger.debug("РЎС‚Р°С‚СѓСЃ Р·Р°РґР°С‡Рё {} РѕР±РЅРѕРІР»РµРЅ РЅР° {} РІ Room РєСЌС€", uid, isDone)
+            logger.debug("Статус задачи {} обновлен на {} в Room кэш\n", uid, isDone)
         } catch (e: Exception) {
-            logger.error("РћС€РёР±РєР° РїСЂРё РѕР±РЅРѕРІР»РµРЅРёРё СЃС‚Р°С‚СѓСЃР° Р·Р°РґР°С‡Рё  РІ Room", e)
+            logger.error("Ошибка при обновлении статуса задачи  в Room\n", e)
             throw e
         }
     }
@@ -86,12 +86,12 @@ class RoomCache(context: Context) {
         try {
             val deletedRows = todoDao.deleteTodoById(uid)
             if (deletedRows > 0) {
-                logger.debug("Р—Р°РґР°С‡Р° {} СѓРґР°Р»РµРЅР° РёР· Room РєСЌС€Р°", uid)
+                logger.debug("Задача {} удалена из Room кэша\n", uid)
             } else {
-                logger.warn("Р—Р°РґР°С‡Р° {} РЅРµ РЅР°Р№РґРµРЅР° РІ Room РєСЌС€Рµ РґР»СЏ СѓРґР°Р»РµРЅРёСЏ", uid)
+                logger.warn("Задача {} не найдена в Room кэше для удаления\n", uid)
             }
         } catch (e: Exception) {
-            logger.error("РћС€РёР±РєР° РїСЂРё СѓРґР°Р»РµРЅРёРё Р·Р°РґР°С‡Рё  РёР· Room", e)
+            logger.error("Ошибка при удалении задачи из Room\n", e)
             throw e
         }
     }
@@ -100,9 +100,9 @@ class RoomCache(context: Context) {
     suspend fun clearAllCache() {
         try {
             todoDao.deleteAllTodos()
-            logger.info("Р’РµСЃСЊ Room РєСЌС€ РѕС‡РёС‰РµРЅ")
+            logger.info("Room кэш очищен\n")
         } catch (e: Exception) {
-            logger.error("РћС€РёР±РєР° РїСЂРё РѕС‡РёСЃС‚РєРµ Room РєСЌС€Р°", e)
+            logger.error("Ошибка при очистке Room кэша", e)
             throw e
         }
     }
@@ -111,7 +111,7 @@ class RoomCache(context: Context) {
         return try {
             todoDao.getTodosCount()
         } catch (e: Exception) {
-            logger.error("РћС€РёР±РєР° РїСЂРё РїРѕР»СѓС‡РµРЅРёРё РєРѕР»РёС‡РµСЃС‚РІР° Р·Р°РґР°С‡ РІ Room", e)
+            logger.error("Ошибка при получении количества задач в Room\n", e)
             0L
         }
     }
@@ -150,10 +150,10 @@ class RoomCache(context: Context) {
             val thirtyDaysAgo = System.currentTimeMillis() - (30 * 24 * 60 * 60 * 1000L)
             val deletedCount = todoDao.deleteOldCompletedTodos(thirtyDaysAgo)
             if (deletedCount > 0) {
-                logger.info("РЈРґР°Р»РµРЅРѕ  СЃС‚Р°СЂС‹С… РІС‹РїРѕР»РЅРµРЅРЅС‹С… Р·Р°РґР°С‡ РёР· Room РєСЌС€Р°")
+                logger.info("Удалено  старых выполненных задач из Room кэша\n")
             }
         } catch (e: Exception) {
-            logger.error("РћС€РёР±РєР° РїСЂРё РѕС‡РёСЃС‚РєРµ СЃС‚Р°СЂС‹С… Р·Р°РґР°С‡ РёР· Room", e)
+            logger.error("Ошибка при очистке старых задач из Room\n", e)
         }
     }
 }
