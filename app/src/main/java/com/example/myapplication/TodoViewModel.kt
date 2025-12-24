@@ -43,7 +43,7 @@ class TodoViewModel(
                             isLoading = false,
                             error = null,
                             isOnline = true,
-                            isApiConfigured = ApiConfig.BASE_URL.contains("your-real-api-server.com").not()
+                            isApiConfigured = ApiConfig.BASE_URL.contains("http://10.0.2.2:3000/api/").not()
                         )
                     }
                 }
