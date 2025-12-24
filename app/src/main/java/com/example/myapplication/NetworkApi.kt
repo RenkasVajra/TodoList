@@ -16,14 +16,7 @@ class NetworkApiImpl(
 
     private val logger = LoggerFactory.getLogger(NetworkApiImpl::class.java)
 
-    private fun isApiConfigured(): Boolean {
-        return !ApiConfig.BASE_URL.contains("your-real-api-server.com")
-    }
     override suspend fun loadTodosFromBackend(): List<TodoItem> {
-        if (!isApiConfigured()) {
-            logger.warn("API не настроен, возвращаем пустой список")
-            return emptyList()
-        }
 
         return try {
             logger.info("Загрузка задач из бэкенда")
@@ -50,12 +43,6 @@ class NetworkApiImpl(
 
     override suspend fun sendTodoToBackend(todoItem: TodoItem) {
         logger.info("Попытка отправки задачи на бэкенд: ${todoItem.text}")
-
-        if (!isApiConfigured()) {
-            logger.warn("API не настроен, пропускаем отправку задачи на бэкенд")
-            return
-        }
-
         try {
             logger.info("Отправка задачи '${todoItem.text}' на бэкенд (простая схема)")
             val apiModel = todoItem.toApiModel()
@@ -81,10 +68,6 @@ class NetworkApiImpl(
 
 
     override suspend fun deleteTodoFromBackend(uid: String) {
-        if (!isApiConfigured()) {
-            logger.warn("API не настроен, пропускаем удаление задачи с бэкенда")
-            return
-        }
 
         try {
             logger.info("Удаление задачи '$uid' с бэкенда (простая схема)")
